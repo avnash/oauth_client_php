@@ -9,6 +9,7 @@ class OAuth {
 
   function init() {
     if($this->isLoggedIn_client()){
+error_log("llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll");
       $this->generateAccessReq();
       $this->getUser();
     $this->signoutURL = AUTH_SERVER . CMD_SIGNOUT . "?response_type=". RESPONSE_TYPE ."&client_id=" . CLIENT_ID . "&redirect_uri=" . $this->redirect_uri . "&scope=". SCOPE . "&state=" . STATE;
@@ -45,19 +46,18 @@ class OAuth {
   }
 
   function generateTokenReq() {
-    $this->tokenURL = AUTH_SERVER . CMD_REQUEST_TOKEN . "?client_id=" . CLIENT_ID . "\&client_secret=" . CLIENT_SECRET . "&grant_type=" . GRANT_TYPE . "&redirect_uri=" . $this->redirect_uri . "&code=". $this->authCode;
+    $this->tokenURL = AUTH_SERVER . CMD_REQUEST_TOKEN . "?client_id=" . CLIENT_ID . "&client_secret=" . CLIENT_SECRET . "&grant_type=" . GRANT_TYPE . "&redirect_uri=" . $this->redirect_uri . "&authorization_code=". $this->authCode;
 
   }
 
   function generateAccessReq() {
-    $this->accessURL = AUTH_SERVER . CMD_REQUEST_ACCESS . "?client_id=" . CLIENT_ID . "\&client_secret=" . CLIENT_SECRET . "\&access_token=" . $this->accessToken;
-
+    $this->accessURL = AUTH_SERVER . CMD_REQUEST_ACCESS . "?client_id=" . CLIENT_ID . "&client_secret=" . CLIENT_SECRET . "&access_token=" .$this->accessToken;
   }
 
   function getToken() {
     $contents = file_get_contents($this->tokenURL);
-    $contents = json_encode($contents, true);
-    $this->accessToken = $contents['access_token'];
+//    $contents = json_decode($contents);
+    $this->accessToken = substr($contents,0,40);
   }
 
   function getAccessToken() {
@@ -83,7 +83,7 @@ class OAuth {
   }
   function getUser() {
     $contents = file_get_contents($this->accessURL);
-    $this->user = json_encode($contents, true);
+    $this->user = $contents;
   }
 }
 ?>
