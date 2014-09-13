@@ -1,15 +1,14 @@
 <?php
 class OAuth {
   function __construct() {
-    $redirect_uri = rtrim("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]", $_SERVER['QUERY_STRING']);
-    $this->redirect_uri = rtrim($redirect_uri, '?');
+    $this->redirect_uri = rtrim("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]", $_SERVER['QUERY_STRING']);
+    $this->redirect_uri = rtrim($this->redirect_uri, "/?");
     $this->authCode = $_GET['authorization_code'];
     $this->accessToken = $_SESSION['access_token'];
   }
 
   function init() {
     if($this->isLoggedIn_client()){
-error_log("llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll");
       $this->generateAccessReq();
       $this->getUser();
     $this->signoutURL = AUTH_SERVER . CMD_SIGNOUT . "?response_type=". RESPONSE_TYPE ."&client_id=" . CLIENT_ID . "&redirect_uri=" . $this->redirect_uri . "&scope=". SCOPE . "&state=" . STATE;
@@ -56,8 +55,8 @@ error_log("llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll"
 
   function getToken() {
     $contents = file_get_contents($this->tokenURL);
-//    $contents = json_decode($contents);
-    $this->accessToken = substr($contents,0,40);
+    $contents = json_decode($contents,true);
+    $this->accessToken = $contents['access_token'];
   }
 
   function getAccessToken() {
@@ -77,13 +76,13 @@ error_log("llllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll"
     }
     return 0;
   }
-  
+
   function redirectTo($url) {
     header('Location:'.$url);
   }
   function getUser() {
     $contents = file_get_contents($this->accessURL);
-    $this->user = $contents;
+    $this->user = json_decode($contents, true);
   }
 }
 ?>
